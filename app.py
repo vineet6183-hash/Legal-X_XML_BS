@@ -309,6 +309,30 @@ SUMMARY_COLS = [
 
 st.set_page_config(page_title="Legal-X Invoice Extractor", page_icon="📄", layout="wide")
 
+
+# ── Password gate ───────────────────────────────────────────────────────────
+def check_password():
+    expected = st.secrets.get("APP_PASSWORD", "")
+    if not expected:
+        return True  # no password configured — open access
+
+    if st.session_state.get("authenticated"):
+        return True
+
+    st.title("🔒 Legal-X Invoice Extractor")
+    pwd = st.text_input("Enter password", type="password", key="pwd_input")
+    if st.button("Login"):
+        if pwd == expected:
+            st.session_state["authenticated"] = True
+            st.rerun()
+        else:
+            st.error("Incorrect password.")
+    return False
+
+
+if not check_password():
+    st.stop()
+
 st.title("📄 Legal-X Invoice Extractor")
 st.caption("Extract invoice data from Legal-X portal XML files into Excel")
 
